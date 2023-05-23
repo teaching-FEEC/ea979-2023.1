@@ -1,2 +1,2 @@
-# Labs-CG-2022.2
-Todos os códigos dos Labs utilizados na turma de CG/DCC/UFBA em 2022.2
+# Labs EA979 2023.1
+Os laboratórios foram desenvolvidos pelo Prof. Antonio Lopes Apolinario Jr. do Departamento de Ciência da Computação da Universidade Federal da Bahia (UFBA).
