@@ -1,0 +1,100 @@
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+		<link rel="icon" type="image/x-icon" href="../../Assets/icons/icon.png">	
+	</head>
+
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../../Assets/scripts/three.js/build/three.module.js"
+			}
+		}
+	</script>
+
+	<script id="RayTracing_VS" type="x-shader/x-vertex">
+
+		varying vec3 vWorld; 	
+	
+		void main(void) {
+			vWorld = (modelMatrix * vec4(position, 1.0)).xyz;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+		}
+	</script>
+	
+	<script id="RayTracing_FS" type="x-shader/x-fragment">
+		precision mediump float;
+
+		uniform vec3 uCamPos;	
+
+		varying vec3 vWorld; 
+
+		vec3 eCenter 	= vec3(0.0, 0.0, 0.0);
+		vec3 	O, 
+				P;
+
+		float eRadius 	= 8.0;
+		vec3 lPos 		= vec3(0.5, 1.0, 0.3);
+		vec3 aColor 	= vec3(1.0, 0.0, 0.0);
+
+		/// *********************************************
+		float rayHitSphere(vec3 ray) {
+			float a = dot(ray, ray);
+			float b = 2.0 * dot(O, ray);
+			float c = dot (O, O) - eRadius*eRadius;
+			float delta = b*b - (4.0*a*c);
+
+			if (delta < 0.0)
+				return -1.0;
+			
+			return  min( ((-b) - sqrt(delta)) / (2.0*a), 
+						 ((-b) + sqrt(delta)) / (2.0*a) );
+			}	
+
+		/// *********************************************
+		vec4 CorDeFundo(vec3 ray) {
+			float t = (ray.y + 10.0) / 20.0;
+			return (vec4((1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0), 1.0));
+			}
+
+		/// *********************************************
+		vec3 genNormal(vec3 r, float t) {
+			vec3 pW = uCamPos + t * r;
+			vec3 N = normalize(2.0 * (pW - eCenter));
+			
+			return (0.5 * (N + vec3(1.0)));  // converte para o intervalo [0.0..1.0] 
+			}
+
+		/// *********************************************
+		/// *********************************************
+		/// *********************************************
+		void main(void) {	
+
+			O = uCamPos - eCenter;
+			P = vWorld - eCenter;
+
+			vec3 D = P - O;
+			
+			float t = rayHitSphere(D);
+
+			if (t < 0.0) 
+				gl_FragColor = CorDeFundo(D);
+			else 
+				gl_FragColor = vec4(genNormal(D, t), 1.0);
+			}
+	</script>
+
+	<script type=module src="./cenarioBaseRT.js"></script>
+	
+	<body>
+		<h3 id="output-text">Visualizando a Orientação da Esfera</h3>
+		<div id="threejs-canvas"></div>
+	</body>
+</html>
+	</body>
+</html>

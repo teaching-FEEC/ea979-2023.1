@@ -1,0 +1,25 @@
+<html>
+ <head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <link rel="icon" type="image/x-icon" href="../../Assets/icons/icon.png">
+ </head>
+
+ <!-- Import maps polyfill -->
+ <!-- Remove this when import maps will be widely supported -->
+ <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+ <script type="importmap">
+  {
+   "imports": {
+    "three": "../../Assets/scripts/three.js/build/three.module.js"
+   }
+  }
+ </script>
+ <script type="module" src="1-ObjectSpace.js"></script>
+
+ <body>
+  <h3 id="output-text">Objetos em seus <i>Object Spaces</i>.</a></h3>
+  <div id="threejs-canvas"></div>
+ </body>
+</html>

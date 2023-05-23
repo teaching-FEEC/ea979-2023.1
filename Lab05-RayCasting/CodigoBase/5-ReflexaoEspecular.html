@@ -1,0 +1,111 @@
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+		<link rel="icon" type="image/x-icon" href="../../Assets/icons/icon.png">	
+	</head>
+
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../../Assets/scripts/three.js/build/three.module.js"
+			}
+		}
+	</script>
+
+		<script id="RayTracing_VS" type="x-shader/x-vertex">
+
+		varying vec3 vWorld; 	
+	
+		void main(void) {
+			vWorld = (modelMatrix * vec4(position, 1.0)).xyz;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+		}
+	</script>
+	
+	<script id="RayTracing_FS" type="x-shader/x-fragment">
+		precision mediump float;
+
+		uniform vec3 uCamPos;
+
+		vec3 eCenter 	= vec3(0.0, 0.0, 0.0);
+		vec3 	O, 
+				P;
+
+		float eRadius 	= 8.0;
+		vec3 lPos 		= vec3(0.5, 1.0, 0.3);
+		vec3 lColor 	= vec3(1.0, 1.0, 1.0);
+		vec3 dColor 	= vec3(1.0, 0.0, 0.0);
+		vec3 eColor 	= vec3(1.0, 1.0, 1.0);
+		float nCos		= 500.0;
+
+		varying vec3 vWorld; 
+
+		/// *********************************************
+		float rayHitSphere(vec3 ray) {
+			float a = dot(ray, ray);
+			float b = 2.0 * dot(O, ray);
+			float c = dot (O, O) - eRadius*eRadius;
+			float delta = b*b - (4.0*a*c);
+
+			if (delta < 0.0)
+				return -1.0;
+			
+			return (((-b) - sqrt(delta)) / (2.0*a));
+			}	
+
+		/// *********************************************
+		vec4 CorDeFundo(vec3 ray) {
+			float t = (ray.y + 10.0) / 20.0;
+			return (vec4((1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0), 1.0));
+			}
+
+		/// *********************************************
+		vec4 compEspecular(vec3 ray, float t) {
+			vec3 pW = O + t * ray;
+
+			vec3 N = normalize(2.0 * pW);
+
+			vec3 L = normalize(lPos); 	// Luz direcional
+
+			vec3 vV = normalize(O - pW); 
+		 	vec3 vR = reflect(-L, N); 
+
+		 	float omega = dot(vV, vR); 
+
+		 	vec4 specular = vec4(lColor.rgb * eColor.rgb * pow(omega, nCos), 1.0); 
+
+			return specular;
+			}
+			
+		/// *********************************************
+		/// *********************************************
+		void main(void) {
+
+			O = uCamPos - eCenter;
+			P = vWorld - eCenter;
+
+			vec3 D = P - O;
+
+			float t = rayHitSphere(D);
+
+			if (t == -1.0) 
+				gl_FragColor = CorDeFundo(D);
+			else 
+				gl_FragColor = compEspecular(D, t);
+			}
+	</script>
+
+	<script type=module src="./cenarioBaseRT.js"></script>
+	
+	<body>
+		<h3 id="output-text">Interação com a Luz - Reflexão Especular</h3>
+		<div id="threejs-canvas"></div>
+	</body>
+</html>
+	</body>
+</html>

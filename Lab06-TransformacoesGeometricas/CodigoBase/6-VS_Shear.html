@@ -1,0 +1,58 @@
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+		<link rel="icon" type="image/x-icon" href="../../Assets/icons/icon.png">	
+	</head>
+
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../../Assets/scripts/three.js/build/three.module.js"
+			}
+		}
+	</script>
+
+	<script id="ShearVS" type="x-shader/x-vertex">
+
+		uniform float uShearX;
+		uniform float uShearY;
+
+		void main(void) {
+
+			vec4 column0 	= vec4(1.0,    	uShearX, 	0.0, 	0.0);
+			vec4 column1 	= vec4(uShearY, 1.0,    	0.0, 	0.0);
+			vec4 column2 	= vec4(0.0,    	0.0,    	1.0, 	0.0);
+			vec4 column3 	= vec4(0.0,    	0.0,    	0.0, 	1.0);
+
+			mat4 mShear 	= mat4(column0, column1, column2, column3); // matrix é inicializa por colunas no GLSL 
+
+			vec4 newVPos 	= mShear * modelMatrix * vec4(position, 1.0);
+			
+			gl_Position 	= projectionMatrix * viewMatrix * newVPos;
+		}
+	</script>
+	
+	<script id="ShearFS" type="x-shader/x-fragment">
+		precision mediump float;
+
+		void main(void) {
+
+			gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+
+			}
+	</script>
+
+	<script type=module src="./6-VS_Shear.js"></script>
+	
+	<body>
+		<h3 id="output-text">Aplicando a transformação geométrica de <i>Shear</i> no <i>Vertex Shader</i></h3>
+		<div id="threejs-canvas"></div>
+	</body>
+</html>
+	</body>
+</html>
